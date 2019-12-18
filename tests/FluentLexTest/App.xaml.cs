@@ -14,7 +14,7 @@ namespace Fluent.Sample.Foundation
     /// <summary>
     /// Entry point of the application
     /// </summary>
-    public partial class Application : System.Windows.Application
+    public partial class App : System.Windows.Application
     {
     }
 }

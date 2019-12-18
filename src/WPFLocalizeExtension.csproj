@@ -7,19 +7,20 @@
     <AssemblyName>WPFLocalizeExtension</AssemblyName>
 		<Version>$(GitVersion_NuGetVersion)</Version>
 		<AssemblyTitle>WPFLocalizeExtension</AssemblyTitle>
+    <PackageId>WPFLocalizeExtensionEzzFork</PackageId>
 		<Authors>Bernhard Millauer,Uwe Mayer, Konrad Mattheis</Authors>
-		<PackageLicenseUrl>https://github.com/XAMLMarkupExtensions/WPFLocalizationExtension/blob/master/LICENSE</PackageLicenseUrl>
-		<PackageProjectUrl>https://github.com/XAMLMarkupExtensions/WPFLocalizationExtension/</PackageProjectUrl>
+    <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/ezhassen/WPFLocalizationExtension/</PackageProjectUrl>
 		<Copyright>Bernhard Millauer, Uwe Mayer, Konrad Mattheis</Copyright>
-		<Description>LocalizationExtension is a really easy way to localize any type of DependencyProperties or native Properties on DependencyObjects</Description>
-		<Company />
+		<Description>LocalizationExtension is a really easy way to localize any type of DependencyProperties or native Properties on DependencyObjects (This is a fork to support .net core 3.1)</Description>
+    <Company>ezhassen</Company>
 		<Product>WPF Localization Extension</Product>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 		<PackageReleaseNotes></PackageReleaseNotes>
 		<NeutralLanguage>en-US</NeutralLanguage>
 		<PackageTags>wpf localization extension globalization resx csv resource language</PackageTags>
-		<RepositoryUrl>https://github.com/XAMLMarkupExtensions/WPFLocalizationExtension.git</RepositoryUrl>
-
+		<RepositoryUrl>https://github.com/ezhassen/WPFLocalizationExtension</RepositoryUrl>
+    <PackageReleaseNotes></PackageReleaseNotes>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
@@ -63,7 +64,7 @@
 
   <!--PackageReference for all framworks-->
 	<ItemGroup>
-    <PackageReference Include="XAMLMarkupExtensions" Version="1.6.0" />
+    <PackageReference Include="XAMLMarkupExtensionsEzzFork" Version="1.7.0-ezzfork0001" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19367-01" PrivateAssets="All" />
 		<PackageReference Include="GitVersionTask" Version="5.1.1" PrivateAssets="All" />
 	</ItemGroup>

@@ -49,9 +49,9 @@
 
   <!--PackageReference for all framworks-->
 	<ItemGroup>
-		<PackageReference Include="XAMLMarkupExtensions" Version="1.6.0" />
-    <PackageReference Include="ControlzEx" Version="3.0.2.4" />
-     <PackageReference Include="Fluent.Ribbon" Version="6.1.0.326" />
+    <PackageReference Include="XAMLMarkupExtensionsEzzFork" Version="1.7.0-ezzfork0001" />
+    <PackageReference Include="ControlzEx" Version="4.2.0" />
+     <PackageReference Include="Fluent.Ribbon" Version="7.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>

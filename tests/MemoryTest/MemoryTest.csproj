@@ -49,8 +49,8 @@
 
   <!--PackageReference for all framworks-->
 	<ItemGroup>
-		<PackageReference Include="XAMLMarkupExtensions" Version="1.6.0" />
-	</ItemGroup>
+    <PackageReference Include="XAMLMarkupExtensionsEzzFork" Version="1.7.0-ezzfork0001" />
+  </ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\WPFLocalizeExtension.csproj" />

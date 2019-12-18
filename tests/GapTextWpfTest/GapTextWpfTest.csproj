@@ -50,7 +50,7 @@
 
   <!--PackageReference for all framworks-->
 	<ItemGroup>
-		<PackageReference Include="XAMLMarkupExtensions" Version="1.6.0" />
+    <PackageReference Include="XAMLMarkupExtensionsEzzFork" Version="1.7.0-ezzfork0001" />
 	</ItemGroup>
 
 	<ItemGroup>
