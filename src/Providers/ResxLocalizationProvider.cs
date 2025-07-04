@@ -1,7 +1,7 @@
 ﻿#region Copyright information
 // <copyright file="ResxLocalizationProvider.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
-//     http://wpflocalizeextension.codeplex.com/license
+//     https://github.com/XAMLMarkupExtensions/WPFLocalizationExtension/blob/master/LICENSE
 // </copyright>
 // <author>Uwe Mayer</author>
 #endregion
@@ -242,11 +242,7 @@ namespace WPFLocalizeExtension.Providers
             OnProviderChanged(obj);
         }
 
-        /// <summary>
-        /// Get the assembly from the context, if possible.
-        /// </summary>
-        /// <param name="target">The target object.</param>
-        /// <returns>The assembly name, if available.</returns>
+        /// <inheritdoc/>
         protected override string GetAssembly(DependencyObject target)
         {
             if (target == null)
@@ -256,11 +252,7 @@ namespace WPFLocalizeExtension.Providers
             return string.IsNullOrEmpty(assembly) ? FallbackAssembly : assembly;
         }
 
-        /// <summary>
-        /// Get the dictionary from the context, if possible.
-        /// </summary>
-        /// <param name="target">The target object.</param>
-        /// <returns>The dictionary name, if available.</returns>
+        /// <inheritdoc/>
         protected override string GetDictionary(DependencyObject target)
         {
             if (target == null)

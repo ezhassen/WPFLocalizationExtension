@@ -1,13 +1,13 @@
 ﻿#region Copyright information
 // <copyright file="GapTextControl.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
-//     http://wpflocalizeextension.codeplex.com/license
+//     https://github.com/XAMLMarkupExtensions/WPFLocalizationExtension/blob/master/LICENSE
 // </copyright>
 // <author>Peter Wendorff</author>
 // <author>Uwe Mayer</author>
 #endregion
 
-namespace WPFLocalizeExtension.Engine
+namespace WPFLocalizeExtension.Deprecated.Engine
 {
     #region Usings
     using System;
@@ -25,6 +25,7 @@ namespace WPFLocalizeExtension.Engine
     /// <summary>
     /// A gap text control.
     /// </summary>
+    [Obsolete("GapTextControl is deprecated and will be removed in version 4.0, see documentation",false)]
     [TemplatePart(Name = PART_TextBlock, Type = typeof(TextBlock))]
     public class GapTextControl : Control
     {

@@ -1,22 +1,10 @@
 ﻿#region Copyright information
 // <copyright file="LocalizeDictionary.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
-//     http://wpflocalizeextension.codeplex.com/license
+//     https://github.com/XAMLMarkupExtensions/WPFLocalizationExtension/blob/master/LICENSE
 // </copyright>
 // <author>Bernhard Millauer</author>
 // <author>Uwe Mayer</author>
-#endregion
-
-#region AssemblyAttributes
-// TODO: check for move to Assembly.cs,..
-using System.Windows.Markup;
-// Register this namespace one with prefix
-[assembly: XmlnsDefinition("http://wpflocalizeextension.codeplex.com", "WPFLocalizeExtension.Engine")]
-[assembly: XmlnsDefinition("http://wpflocalizeextension.codeplex.com", "WPFLocalizeExtension.Extensions")]
-[assembly: XmlnsDefinition("http://wpflocalizeextension.codeplex.com", "WPFLocalizeExtension.Providers")]
-[assembly: XmlnsDefinition("http://wpflocalizeextension.codeplex.com", "WPFLocalizeExtension.TypeConverters")]
-// Assign a default namespace prefix for the schema
-[assembly: XmlnsPrefix("http://wpflocalizeextension.codeplex.com", "lex")]
 #endregion
 
 namespace WPFLocalizeExtension.Engine
@@ -270,6 +258,7 @@ namespace WPFLocalizeExtension.Engine
             return obj.GetValueSync<ILocalizationProvider>(ProviderProperty);
         }
 
+#pragma warning disable IDE0060
         /// <summary>
         /// Getter of <see cref="DependencyProperty"/> DefaultProvider.
         /// </summary>
@@ -319,6 +308,7 @@ namespace WPFLocalizeExtension.Engine
         {
             return Instance.OutputMissingKeys;
         }
+#pragma warning restore IDE0060
 
         /// <summary>
         /// Getter of <see cref="DependencyProperty"/> DesignCulture.
@@ -348,6 +338,7 @@ namespace WPFLocalizeExtension.Engine
             obj.SetValueSync(ProviderProperty, value);
         }
 
+#pragma warning disable IDE0060
         /// <summary>
         /// Setter of <see cref="DependencyProperty"/> DefaultProvider.
         /// </summary>
@@ -397,6 +388,7 @@ namespace WPFLocalizeExtension.Engine
         {
             Instance.OutputMissingKeys = value;
         }
+#pragma warning restore IDE0060
 
         /// <summary>
         /// Setter of <see cref="DependencyProperty"/> DesignCulture.
@@ -800,7 +792,7 @@ namespace WPFLocalizeExtension.Engine
         /// <returns>The value corresponding to the source/dictionary/key path for the given culture (otherwise NULL).</returns>
         public object GetLocalizedObject(string key, DependencyObject target, CultureInfo culture)
         {
-            if (DefaultProvider is InheritingResxLocalizationProvider)
+            if (DefaultProvider is IInheritingLocalizationProvider)
                 return GetLocalizedObject(key, target, culture, DefaultProvider);
 
             var provider = target?.GetValue(GetProvider);
@@ -835,7 +827,7 @@ namespace WPFLocalizeExtension.Engine
         /// <returns>Returns an object with all possible pieces of the given key (Assembly, Dictionary, Key)</returns>
         public FullyQualifiedResourceKeyBase GetFullyQualifiedResourceKey(string key, DependencyObject target)
         {
-            if (DefaultProvider is InheritingResxLocalizationProvider)
+            if (DefaultProvider is IInheritingLocalizationProvider)
                 return GetFullyQualifiedResourceKey(key, target, DefaultProvider);
 
             var provider = target?.GetValue(GetProvider);
@@ -977,7 +969,7 @@ namespace WPFLocalizeExtension.Engine
             /// <summary>
             /// The list of listeners
             /// </summary>
-            private static readonly List<WeakReference> Listeners = new List<WeakReference>();
+            private static readonly ListenersList Listeners = new ListenersList();
             private static readonly object ListenersLock = new object();
 
             /// <summary>
@@ -987,22 +979,25 @@ namespace WPFLocalizeExtension.Engine
             /// <param name="args">The event arguments.</param>
             internal static void Invoke(DependencyObject sender, DictionaryEventArgs args)
             {
-                var list = new List<IDictionaryEventListener>();
-
                 lock (ListenersLock)
                 {
-                    foreach (var wr in Listeners.ToList())
+                    var exceptions = new List<Exception>();
+                    
+                    foreach (var listener in Listeners.GetListeners())
                     {
-                        var targetReference = wr.Target;
-                        if (targetReference != null)
-                            list.Add((IDictionaryEventListener)targetReference);
-                        else
-                            Listeners.Remove(wr);
+                        try
+                        {
+                            listener.ResourceChanged(sender, args);
+                        }
+                        catch (Exception e)
+                        {
+                            exceptions.Add(e);
+                        }
                     }
-                }
 
-                foreach (var item in list)
-                    item.ResourceChanged(sender, args);
+                    if (exceptions.Count > 0)
+                        throw new AggregateException(exceptions);
+                }
             }
 
             /// <summary>
@@ -1013,24 +1008,10 @@ namespace WPFLocalizeExtension.Engine
             {
                 if (listener == null)
                     return;
-
-                // Check, if this listener already was added.
-                bool listenerExists = false;
-
+                
                 lock (ListenersLock)
                 {
-                    foreach (var wr in Listeners.ToList())
-                    {
-                        var targetReference = wr.Target;
-                        if (targetReference == null)
-                            Listeners.Remove(wr);
-                        else if (targetReference == listener)
-                            listenerExists = true;
-                    }
-
-                    // Add it now.
-                    if (!listenerExists)
-                        Listeners.Add(new WeakReference(listener));
+                    Listeners.AddListener(listener);
                 }
             }
 
@@ -1045,14 +1026,7 @@ namespace WPFLocalizeExtension.Engine
 
                 lock (ListenersLock)
                 {
-                    foreach (var wr in Listeners.ToList())
-                    {
-                        var targetReference = wr.Target;
-                        if (targetReference == null)
-                            Listeners.Remove(wr);
-                        else if ((IDictionaryEventListener)targetReference == listener)
-                            Listeners.Remove(wr);
-                    }
+                    Listeners.RemoveListener(listener);
                 }
             }
 
@@ -1065,14 +1039,9 @@ namespace WPFLocalizeExtension.Engine
             {
                 lock (ListenersLock)
                 {
-                    foreach (var wr in Listeners.ToList())
+                    foreach (var listener in Listeners.GetListeners().OfType<T>())
                     {
-                        var targetReference = wr.Target;
-
-                        if (targetReference == null)
-                            Listeners.Remove(wr);
-                        else if (targetReference is T)
-                            yield return (T)targetReference;
+                        yield return listener;
                     }
                 }
             }

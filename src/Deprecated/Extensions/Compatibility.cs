@@ -1,61 +1,85 @@
 ﻿#region Copyright information
 // <copyright file="Compatibility.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
-//     http://wpflocalizeextension.codeplex.com/license
+//     https://github.com/XAMLMarkupExtensions/WPFLocalizationExtension/blob/master/LICENSE
 // </copyright>
 // <author>Bernhard Millauer</author>
 // <author>Uwe Mayer</author>
 #endregion
 
-namespace WPFLocalizeExtension.Extensions
+namespace WPFLocalizeExtension.Deprecated.Extensions
 {
     #region Usings
     using System;
     using System.Windows.Markup;
     using WPFLocalizeExtension.Engine;
+    using WPFLocalizeExtension.Extensions;
     using XAMLMarkupExtensions.Base;
     #endregion
 
-#pragma warning disable 1591
-
+    /// <inheritdoc/>
+    [Obsolete("LocBrushExtension is deprecated and will be removed in version 4.0, please use lex:Loc instead and see documentation", false)]
     [MarkupExtensionReturnType(typeof(System.Windows.Media.Brush))]
     public class LocBrushExtension : LocExtension
     {
+        /// <inheritdoc/>
         public LocBrushExtension()
         { }
+
+        /// <inheritdoc/>
         public LocBrushExtension(string key) : base(key) { }
     }
 
+    /// <inheritdoc/>
+    [Obsolete("LocDoubleExtension is deprecated and will be removed in version 4.0, please use lex:Loc instead and see documentation", false)]
     [MarkupExtensionReturnType(typeof(double))]
     public class LocDoubleExtension : LocExtension
     {
+        /// <inheritdoc/>
         public LocDoubleExtension()
         { }
+
+        /// <inheritdoc/>
         public LocDoubleExtension(string key) : base(key) { }
     }
 
+    /// <inheritdoc/>
     [MarkupExtensionReturnType(typeof(System.Windows.FlowDirection))]
+    [Obsolete("LocFlowDirectionExtension is deprecated and will be removed in version 4.0, please use lex:Loc instead and see documentation", false)]
     public class LocFlowDirectionExtension : LocExtension
     {
+        /// <inheritdoc/>
         public LocFlowDirectionExtension()
         { }
+
+        /// <inheritdoc/>
         public LocFlowDirectionExtension(string key) : base(key) { }
     }
 
+    /// <inheritdoc/>
     [MarkupExtensionReturnType(typeof(System.Windows.Media.Imaging.BitmapSource))]
+    [Obsolete("LocImageExtension is deprecated and will be removed in version 4.0, please use lex:Loc instead and see documentation", false)]
     public class LocImageExtension : LocExtension
     {
+        /// <inheritdoc/>
         public LocImageExtension()
         { }
+
+        /// <inheritdoc/>
         public LocImageExtension(string key) : base(key) { }
     }
 
+    /// <inheritdoc/>
     [MarkupExtensionReturnType(typeof(string))]
+    [Obsolete("LocTextExtension is deprecated and will be removed in version 4.0, please use lex:Loc instead and see documentation", false)]
     public class LocTextExtension : LocExtension
     {
         #region Constructors
+        /// <inheritdoc/>
         public LocTextExtension()
         { }
+
+        /// <inheritdoc/>
         public LocTextExtension(string key) : base(key) { }
         #endregion
 
@@ -213,11 +237,7 @@ namespace WPFLocalizeExtension.Extensions
             return target ?? string.Empty;
         }
 
-        /// <summary>
-        /// This function returns the properly prepared output of the markup extension.
-        /// </summary>
-        /// <param name="info">Information about the target.</param>
-        /// <param name="endPoint">Information about the endpoint.</param>
+        /// <inheritdoc/>
         public override object FormatOutput(TargetInfo endPoint, TargetInfo info)
         {
             var textMain = base.FormatOutput(endPoint, info) as string ?? string.Empty;
@@ -254,24 +274,22 @@ namespace WPFLocalizeExtension.Extensions
         #endregion
     }
 
+    /// <inheritdoc/>
     [MarkupExtensionReturnType(typeof(string))]
+    [Obsolete("LocTextLowerExtension is deprecated and will be removed in version 4.0, please use lex:Loc instead and see documentation", false)]
     public class LocTextLowerExtension : LocTextExtension
     {
         #region Constructors
+        /// <inheritdoc/>
         public LocTextLowerExtension()
         { }
+
+        /// <inheritdoc/>
         public LocTextLowerExtension(string key) : base(key) { }
         #endregion
 
         #region Text Formatting
-        /// <summary>
-        /// This method formats the localized text.
-        /// If the passed target text is null, string.empty will be returned.
-        /// </summary>
-        /// <param name="target">The text to format.</param>
-        /// <returns>
-        /// Returns the formated text or string.empty, if the target text was null.
-        /// </returns>
+        /// <inheritdoc/>
         protected override string FormatText(string target)
         {
             return target?.ToLower(GetForcedCultureOrDefault()) ?? string.Empty;
@@ -279,24 +297,22 @@ namespace WPFLocalizeExtension.Extensions
         #endregion
     }
 
+    /// <inheritdoc/>
     [MarkupExtensionReturnType(typeof(string))]
+    [Obsolete("LocTextUpperExtension is deprecated and will be removed in version 4.0, please use lex:Loc instead and see documentation", false)]
     public class LocTextUpperExtension : LocTextExtension
     {
         #region Constructors
+        /// <inheritdoc/>
         public LocTextUpperExtension()
         { }
+
+        /// <inheritdoc/>
         public LocTextUpperExtension(string key) : base(key) { }
         #endregion
 
         #region Text Formatting
-        /// <summary>
-        /// This method formats the localized text.
-        /// If the passed target text is null, string.empty will be returned.
-        /// </summary>
-        /// <param name="target">The text to format.</param>
-        /// <returns>
-        /// Returns the formated text or string.empty, if the target text was null.
-        /// </returns>
+        /// <inheritdoc/>
         protected override string FormatText(string target)
         {
             return target?.ToUpper(GetForcedCultureOrDefault()) ?? string.Empty;
@@ -304,13 +320,16 @@ namespace WPFLocalizeExtension.Extensions
         #endregion
     }
 
+    /// <inheritdoc/>
     [MarkupExtensionReturnType(typeof(System.Windows.Thickness))]
+    [Obsolete("LocThicknessExtension is deprecated and will be removed in version 4.0, please use lex:Loc instead and see documentation", false)]
     public class LocThicknessExtension : LocExtension
     {
+        /// <inheritdoc/>
         public LocThicknessExtension()
         { }
+
+        /// <inheritdoc/>
         public LocThicknessExtension(string key) : base(key) { }
     }
-
-#pragma warning restore 1591
 }

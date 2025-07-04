@@ -1,32 +1,30 @@
 #region Copyright information
-// <copyright file="CSVEmbeddedLocalizationProvider.cs">
+// <copyright file="CSVLocalizationProvider.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
-//     http://wpflocalizeextension.codeplex.com/license
+//     https://github.com/XAMLMarkupExtensions/WPFLocalizationExtension/blob/master/LICENSE
 // </copyright>
 // <author>Sébastien Sevrin</author>
 #endregion
 
-namespace WPFLocalizeExtension.Providers
+namespace WPFLocalizeExtension.Deprecated.Providers
 {
     #region Usings
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Globalization;
     using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using System.Resources;
     using System.Text;
     using System.Windows;
     using WPFLocalizeExtension.Engine;
+    using WPFLocalizeExtension.Providers;
     using XAMLMarkupExtensions.Base;
     #endregion
 
     /// <summary>
     /// A singleton CSV provider that uses attached properties and the Parent property to iterate through the visual tree.
     /// </summary>
-    public class CSVEmbeddedLocalizationProvider : CSVLocalizationProviderBase
+    [Obsolete("CSVLocalizationProvider is deprecated and will be removed in version 4.0, see documentation", false)]
+    public class CSVLocalizationProvider : CSVLocalizationProviderBase
     {
         #region Dependency Properties
         /// <summary>
@@ -36,17 +34,7 @@ namespace WPFLocalizeExtension.Providers
                 DependencyProperty.RegisterAttached(
                 "DefaultDictionary",
                 typeof(string),
-                typeof(CSVEmbeddedLocalizationProvider),
-                new PropertyMetadata(null, AttachedPropertyChanged));
-
-        /// <summary>
-        /// <see cref="DependencyProperty"/> DefaultAssembly to set the fallback assembly.
-        /// </summary>
-        public static readonly DependencyProperty DefaultAssemblyProperty =
-            DependencyProperty.RegisterAttached(
-                "DefaultAssembly",
-                typeof(string),
-                typeof(CSVEmbeddedLocalizationProvider),
+                typeof(CSVLocalizationProvider),
                 new PropertyMetadata(null, AttachedPropertyChanged));
         #endregion
 
@@ -73,16 +61,6 @@ namespace WPFLocalizeExtension.Providers
         {
             return obj.GetValueSync<string>(DefaultDictionaryProperty);
         }
-
-        /// <summary>
-        /// Getter of <see cref="DependencyProperty"/> default assembly.
-        /// </summary>
-        /// <param name="obj">The dependency object to get the default assembly from.</param>
-        /// <returns>The default assembly.</returns>
-        public static string GetDefaultAssembly(DependencyObject obj)
-        {
-            return obj.GetValueSync<string>(DefaultAssemblyProperty);
-        }
         #endregion
 
         #region Set
@@ -94,16 +72,6 @@ namespace WPFLocalizeExtension.Providers
         public static void SetDefaultDictionary(DependencyObject obj, string value)
         {
             obj.SetValueSync(DefaultDictionaryProperty, value);
-        }
-
-        /// <summary>
-        /// Setter of <see cref="DependencyProperty"/> default assembly.
-        /// </summary>
-        /// <param name="obj">The dependency object to set the default assembly to.</param>
-        /// <param name="value">The assembly.</param>
-        public static void SetDefaultAssembly(DependencyObject obj, string value)
-        {
-            obj.SetValueSync(DefaultAssemblyProperty, value);
         }
         #endregion
         #endregion
@@ -119,7 +87,7 @@ namespace WPFLocalizeExtension.Providers
         /// <summary>
         /// The instance of the singleton.
         /// </summary>
-        private static CSVEmbeddedLocalizationProvider _instance;
+        private static CSVLocalizationProvider _instance;
 
         /// <summary>
         /// Lock object for the creation of the singleton instance.
@@ -127,9 +95,9 @@ namespace WPFLocalizeExtension.Providers
         private static readonly object InstanceLock = new object();
 
         /// <summary>
-        /// Gets the <see cref="CSVEmbeddedLocalizationProvider"/> singleton.
+        /// Gets the <see cref="CSVLocalizationProvider"/> singleton.
         /// </summary>
-        public static CSVEmbeddedLocalizationProvider Instance
+        public static CSVLocalizationProvider Instance
         {
             get
             {
@@ -138,7 +106,7 @@ namespace WPFLocalizeExtension.Providers
                     lock (InstanceLock)
                     {
                         if (_instance == null)
-                            _instance = new CSVEmbeddedLocalizationProvider();
+                            _instance = new CSVLocalizationProvider();
                     }
                 }
 
@@ -150,9 +118,8 @@ namespace WPFLocalizeExtension.Providers
         /// <summary>
         /// The singleton constructor.
         /// </summary>
-        private CSVEmbeddedLocalizationProvider()
+        private CSVLocalizationProvider()
         {
-            ResourceManagerList = new Dictionary<string, ResourceManager>();
             AvailableCultures = new ObservableCollection<CultureInfo> { CultureInfo.InvariantCulture };
         }
 
@@ -167,7 +134,7 @@ namespace WPFLocalizeExtension.Providers
         }
         #endregion
 
-        #region Abstract assembly & dictionary lookup
+        #region Abstract dictionary lookup
         /// <summary>
         /// An action that will be called when a parent of one of the observed target objects changed.
         /// </summary>
@@ -175,16 +142,6 @@ namespace WPFLocalizeExtension.Providers
         private void ParentChangedAction(DependencyObject obj)
         {
             OnProviderChanged(obj);
-        }
-
-        /// <summary>
-        /// Get the assembly from the context, if possible.
-        /// </summary>
-        /// <param name="target">The target object.</param>
-        /// <returns>The assembly name, if available.</returns>
-        protected override string GetAssembly(DependencyObject target)
-        {
-            return target?.GetValueOrRegisterParentNotifier<string>(DefaultAssemblyProperty, ParentChangedAction, _parentNotifiers);
         }
 
         /// <summary>
@@ -198,6 +155,16 @@ namespace WPFLocalizeExtension.Providers
         }
 
         /// <summary>
+        /// Get the assembly from the context, if possible.
+        /// </summary>
+        /// <param name="target">The target object.</param>
+        /// <returns>The assembly name, if available.</returns>
+        protected override string GetAssembly(DependencyObject target)
+        {
+            return target?.GetValueOrRegisterParentNotifier<string>(CSVEmbeddedLocalizationProvider.DefaultAssemblyProperty, ParentChangedAction, _parentNotifiers);
+        }
+
+        /// <summary>
         /// Get the localized object.
         /// </summary>
         /// <param name="key">The key to the value.</param>
@@ -207,59 +174,67 @@ namespace WPFLocalizeExtension.Providers
         public override object GetLocalizedObject(string key, DependencyObject target, CultureInfo culture)
         {
             string ret = null;
-
-            var filename = "";
+            const string filename = "";
 
             // Call this function to provide backward compatibility.
-            ParseKey(key, out var assembly, out var dictionary, out key);
+            ParseKey(key, out _, out var dictionary, out key);
 
             // Now try to read out the default assembly and/or dictionary.
-            if (string.IsNullOrEmpty(assembly))
-                assembly = GetAssembly(target);
-
             if (string.IsNullOrEmpty(dictionary))
                 dictionary = GetDictionary(target);
 
-            var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var assemblyInAppDomain in loadedAssemblies)
+            // Try to get the culture specific file.
+            const string csvDirectory = "Localization";
+            var csvPath = "";
+
+            while (culture != CultureInfo.InvariantCulture)
             {
-                // get the assembly name object
-                var assemblyName = new AssemblyName(assemblyInAppDomain.FullName);
+                csvPath = Path.Combine(csvDirectory, dictionary + (string.IsNullOrEmpty(culture.Name) ? "" : "." + culture.Name) + ".csv");
 
-                // check if the name of the assembly is the seached one
-                if (assemblyName.Name == assembly)
+                if (File.Exists(csvPath))
+                    break;
+
+                culture = culture.Parent;
+            }
+
+            if (!File.Exists(csvPath))
+            {
+                // Take the invariant culture.
+                csvPath = Path.Combine(csvDirectory, dictionary + ".csv");
+
+                if (!File.Exists(csvPath))
                 {
-                    //filename = assemblyInAppDomain.GetManifestResourceNames().Where(r => r.Contains(dictionary)).FirstOrDefault();
-                    filename = assemblyInAppDomain.GetManifestResourceNames().FirstOrDefault(r => r.Contains($"{dictionary}{(string.IsNullOrEmpty(culture.Name) ? "" : "-")}{culture.Name}"));
-                    if (filename != null)
+                    OnProviderError(target, key, "A file for the provided culture " + culture.EnglishName + " does not exist at " + csvPath + ".");
+                    return null;
+                }
+            }
+
+            // Open the file.
+            using (var reader = new StreamReader(csvPath, Encoding.Default))
+            {
+                // Skip the header if needed.
+                if (HasHeader && !reader.EndOfStream)
+                    reader.ReadLine();
+
+                // Read each line and split it.
+                while (!reader.EndOfStream)
+                {
+                    var line = reader.ReadLine();
+                    if (line != null)
                     {
-                        using (var reader = new StreamReader(assemblyInAppDomain.GetManifestResourceStream(filename) ?? throw new InvalidOperationException(), Encoding.Default))
-                        {
-                            if (HasHeader && !reader.EndOfStream)
-                                reader.ReadLine();
+                        var parts = line.Split(";".ToCharArray());
 
-                            // Read each line and split it.
-                            while (!reader.EndOfStream)
-                            {
-                                var line = reader.ReadLine();
-                                if (line != null)
-                                {
-                                    var parts = line.Split(";".ToCharArray());
+                        if (parts.Length < 2)
+                            continue;
 
-                                    if (parts.Length < 2)
-                                        continue;
+                        // Check the key (1st column).
+                        if (parts[0] != key)
+                            continue;
 
-                                    // Check the key (1st column).
-                                    if (parts[0] != key)
-                                        continue;
-
-                                    // Get the value (2nd column).
-                                    ret = parts[1];
-                                }
-                                break;
-                            }
-                        }
+                        // Get the value (2nd column).
+                        ret = parts[1];
                     }
+                    break;
                 }
             }
 

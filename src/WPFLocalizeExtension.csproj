@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
 	<PropertyGroup>
-		<TargetFrameworks>net452;net35;netcoreapp3.1</TargetFrameworks>
-    <UseWPF>True</UseWPF>
-    <AutoGenerateBindingRedirects Condition="$(TargetFramework.StartsWith('net4')) Or $(TargetFramework.StartsWith('net3'))">true</AutoGenerateBindingRedirects>
-    <AssemblyName>WPFLocalizeExtension</AssemblyName>
+		<TargetFrameworks>net452;net40;netcoreapp3.1</TargetFrameworks>
+		<UseWPF>True</UseWPF>
+		<AutoGenerateBindingRedirects Condition="!$(TargetFramework.StartsWith('netcore'))">true</AutoGenerateBindingRedirects>
+		<AssemblyName>WPFLocalizeExtension</AssemblyName>
 		<Version>$(GitVersion_NuGetVersion)</Version>
 		<AssemblyTitle>WPFLocalizeExtension</AssemblyTitle>
     <PackageId>WPFLocalizeExtensionEzzFork</PackageId>
@@ -28,52 +28,66 @@
 		<DelaySign>false</DelaySign>
 		<PublicSign>true</PublicSign>
 		<AssemblyOriginatorKeyFile>public.snk</AssemblyOriginatorKeyFile>
-    <!--Workaround for Error	MSB4216	Could not run the "GenerateResource" -->
-    <GenerateResourceMSBuildArchitecture>CurrentArchitecture</GenerateResourceMSBuildArchitecture>
+		<!--Workaround for Error	MSB4216	Could not run the "GenerateResource" -->
+		<GenerateResourceMSBuildArchitecture>CurrentArchitecture</GenerateResourceMSBuildArchitecture>
+
+		<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
+
+		<UnSignedFlag></UnSignedFlag>
 	</PropertyGroup>
 
-	<Choose>
-		<When Condition="'$(Configuration)' == 'Release'">
-			<PropertyGroup>
-				<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-				<GenerateDocumentationFile>true</GenerateDocumentationFile>
-			</PropertyGroup>
-		</When>
-		<Otherwise>
-			<PropertyGroup>
-				<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-				<GenerateDocumentationFile>false</GenerateDocumentationFile>
-			</PropertyGroup>
-		</Otherwise>
-	</Choose>
-  
-  <!--References for .Net Framwork 4 and 35-->
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net4')) Or $(TargetFramework.StartsWith('net3'))">
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.Management" />
-    <Reference Include="WindowsBase" />
-    <Reference Condition="'$(TargetFramework)' != 'net35'" Include="System.Xaml" />
-  </ItemGroup>
-
-  <!--References for .Net Core 3.1-->
-  <ItemGroup Condition="$(TargetFramework.StartsWith('netcore'))">
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="3.1.0" />
-  </ItemGroup>
-
-  <!--PackageReference for all framworks-->
 	<ItemGroup>
-    <PackageReference Include="XAMLMarkupExtensionsEzzFork" Version="1.7.0-ezzfork0001" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19367-01" PrivateAssets="All" />
-		<PackageReference Include="GitVersionTask" Version="5.1.1" PrivateAssets="All" />
+		<None Include="..\LICENSE" Pack="true" PackagePath="" />
+		<None Remove="packages.lock.json" />
+		<None Remove="public.snk" />
+	</ItemGroup>
+  
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="Exists('$(SolutionDir)\src\fullkey.snk')">
+		<PublicSign>false</PublicSign>
+		<AssemblyOriginatorKeyFile>fullkey.snk</AssemblyOriginatorKeyFile>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(UnSigned)' == 'true'">
+		<SignAssembly>false</SignAssembly>
+		<PublicSign>false</PublicSign>
+		<AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
+		<PackageId>$(AssemblyName).UnSigned</PackageId>
+		<UnSignedFlag>.UnSigned</UnSignedFlag>
+		 <!--we can handle only one packages.lock.json so for now for unsigned just disable the usages--> 
+		<RestorePackagesWithLockFile>false</RestorePackagesWithLockFile>
+	</PropertyGroup>
+  
+	<!--References for .Net Framwork 4 and 35-->
+	<ItemGroup Condition="!$(TargetFramework.StartsWith('netcore'))">
+		<Reference Include="System.Management" />
 	</ItemGroup>
 
-	<Target Name="PublishToNugetWithAPIKey" AfterTargets="GenerateNuspec" Condition="Exists('$(SolutionDir)\..\..\nugetapikey.txt')">
-		<ReadLinesFromFile File="$(SolutionDir)\..\..\nugetapikey.txt">
+	<!--References for .Net Core 3.x-->
+	<ItemGroup Condition="$(TargetFramework.StartsWith('netcore'))">
+		<PackageReference Include="System.Management" Version="7.0.0" />
+		<PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+	</ItemGroup>
+
+	<!--PackageReference for all framworks-->
+	<ItemGroup>
+    <PackageReference Include="XAMLMarkupExtensionsEzzFork" Version="2.1.4" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+		<PackageReference Include="GitVersionTask" Version="5.12.0" PrivateAssets="All" />
+	</ItemGroup>
+
+	<Target Name="PublishToNugetWithAPIKey" AfterTargets="GenerateNuspec">
+		<ReadLinesFromFile Condition="Exists('$(SolutionDir)\..\..\nugetapikey.txt')" File="$(SolutionDir)\..\..\nugetapikey.txt">
 			<Output TaskParameter="Lines" PropertyName="NugetAPIKey" />
 		</ReadLinesFromFile>
-		<Exec WorkingDirectory="$(BaseDir)" Command="dotnet nuget push $(PackageOutputAbsolutePath)$(PackageId).$(PackageVersion).nupkg -k $(NugetAPIKey) -s https://api.nuget.org/v3/index.json" />
+		<Exec Condition="('$(NugetAPIKey)' != '')" WorkingDirectory="$(BaseDir)" Command="dotnet nuget push $(PackageOutputAbsolutePath)$(PackageId).$(PackageVersion).nupkg -k $(NugetAPIKey) -s https://api.nuget.org/v3/index.json" />
 	</Target>
 
 	<Target Name="FixOnGitVersionTaskError" BeforeTargets="GetAssemblyVersion">

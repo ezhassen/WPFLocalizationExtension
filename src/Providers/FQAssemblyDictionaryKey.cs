@@ -1,7 +1,7 @@
 ﻿#region Copyright information
 // <copyright file="FullyQualifiedResourceKeyBase.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
-//     http://wpflocalizeextension.codeplex.com/license
+//     https://github.com/XAMLMarkupExtensions/WPFLocalizationExtension/blob/master/LICENSE
 // </copyright>
 // <author>Justin Pihony</author>
 // <author>Uwe Mayer</author>
@@ -53,7 +53,8 @@ namespace WPFLocalizeExtension.Providers
         /// Converts the object to a string.
         /// </summary>
         /// <returns>The joined version of the assembly, dictionary and key.</returns>
-        public override string ToString()
+        public 
+            override string ToString()
         {
             return string.Join(":", new[] { Assembly, Dictionary, Key }.Where(x => !string.IsNullOrEmpty(x)).ToArray());
         }

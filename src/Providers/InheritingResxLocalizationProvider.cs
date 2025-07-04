@@ -1,7 +1,7 @@
 ﻿#region Copyright information
 // <copyright file="InheritingResxLocalizationProvider.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
-//     http://wpflocalizeextension.codeplex.com/license
+//     https://github.com/XAMLMarkupExtensions/WPFLocalizationExtension/blob/master/LICENSE
 // </copyright>
 // <author>Uwe Mayer</author>
 #endregion
@@ -20,7 +20,7 @@ namespace WPFLocalizeExtension.Providers
     /// <summary>
     /// A singleton RESX provider that uses inheriting attached properties.
     /// </summary>
-    public class InheritingResxLocalizationProvider : ResxLocalizationProviderBase
+    public class InheritingResxLocalizationProvider : ResxLocalizationProviderBase, IInheritingLocalizationProvider
     {
         #region Dependency Properties
         /// <summary>
@@ -145,21 +145,13 @@ namespace WPFLocalizeExtension.Providers
         #endregion
 
         #region Abstract assembly & dictionary lookup
-        /// <summary>
-        /// Get the assembly from the context, if possible.
-        /// </summary>
-        /// <param name="target">The target object.</param>
-        /// <returns>The assembly name, if available.</returns>
+        /// <inheritdoc/>
         protected override string GetAssembly(DependencyObject target)
         {
             return target?.GetValue(DefaultAssemblyProperty) as string;
         }
 
-        /// <summary>
-        /// Get the dictionary from the context, if possible.
-        /// </summary>
-        /// <param name="target">The target object.</param>
-        /// <returns>The dictionary name, if available.</returns>
+        /// <inheritdoc/>
         protected override string GetDictionary(DependencyObject target)
         {
             return target?.GetValue(DefaultDictionaryProperty) as string;

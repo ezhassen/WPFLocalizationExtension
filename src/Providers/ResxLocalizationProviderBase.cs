@@ -1,7 +1,7 @@
 ﻿#region Copyright information
 // <copyright file="ResxLocalizationProviderBase.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
-//     http://wpflocalizeextension.codeplex.com/license
+//     https://github.com/XAMLMarkupExtensions/WPFLocalizationExtension/blob/master/LICENSE
 // </copyright>
 // <author>Uwe Mayer</author>
 // <author>Bernhard Millauer</author>
@@ -67,6 +67,24 @@ namespace WPFLocalizeExtension.Providers
         {
             get => _ignoreCase;
             set => _ignoreCase = value;
+        }
+
+        private List<CultureInfo> searchCultures = null;
+        /// <summary>
+        /// Gets or sets the cultures there the RESX Provider search for.
+        /// </summary>
+        public List<CultureInfo> SearchCultures
+        {
+            get
+            {
+                if (searchCultures == null)
+                    searchCultures = CultureInfo.GetCultures(CultureTypes.AllCultures).ToList();
+                return searchCultures;
+            }
+            set
+            {
+                searchCultures = value;
+            }
         }
         #endregion
 
@@ -419,6 +437,7 @@ namespace WPFLocalizeExtension.Providers
                 }
 
                 // The proposed approach of Andras (http://wpflocalizeextension.codeplex.com/discussions/66098?ProjectName=wpflocalizeextension)
+#pragma warning disable IDE0062
                 string TryGetNamespace(Type type)
                 {
                     // Ignore unloadable types
@@ -431,6 +450,7 @@ namespace WPFLocalizeExtension.Providers
                         return null;
                     }
                 }
+#pragma warning restore IDE0062
 
                 var possiblePrefixes = availableTypes.Select(TryGetNamespace).Where(n => n != null).Distinct().ToList();
 
@@ -486,6 +506,12 @@ namespace WPFLocalizeExtension.Providers
                 }
                 else
                 {
+                    //To be able to use Microsoft Resource like Key=PresentationCore:ExceptionStringTable:DeleteText. It is not detected at line 437
+                    if (resManagerNameToSearch.StartsWith("."))
+                    {
+                        resManagerNameToSearch = resManagerNameToSearch.Remove(0, 1);
+                        resManagerNameToSearch = resManagerNameToSearch.Replace(ResourceFileExtension, string.Empty);
+                    }
                     resManager = new ResourceManager(resManagerNameToSearch, assembly);
                 }
 
@@ -498,10 +524,8 @@ namespace WPFLocalizeExtension.Providers
 
                 try
                 {
-                    // Get the list of all cultures.
-                    var cultures = CultureInfo.GetCultures(CultureTypes.AllCultures);
-
-                    foreach (var c in cultures)
+                    // Look in all cultures and check available ressources.
+                    foreach (var c in SearchCultures)
                     {
                         var rs = resManager.GetResourceSet(c, true, false);
                         if (rs != null)
