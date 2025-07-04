@@ -1,26 +1,26 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net452;net40;netcoreapp3.1</TargetFrameworks>
+		<TargetFrameworks>net40;net452;net462;net472;net48;netcoreapp3.1;net6.0-windows;net8.0-windows;net9.0-windows;</TargetFrameworks>
 		<UseWPF>True</UseWPF>
-		<AutoGenerateBindingRedirects Condition="!$(TargetFramework.StartsWith('netcore'))">true</AutoGenerateBindingRedirects>
+		<AutoGenerateBindingRedirects Condition="$(TargetFramework.StartsWith('net4'))">true</AutoGenerateBindingRedirects>
 		<AssemblyName>WPFLocalizeExtension</AssemblyName>
 		<Version>$(GitVersion_NuGetVersion)</Version>
 		<AssemblyTitle>WPFLocalizeExtension</AssemblyTitle>
-    <PackageId>WPFLocalizeExtensionEzzFork</PackageId>
+		<PackageId>WPFLocalizeExtensionEzzFork</PackageId>
 		<Authors>Bernhard Millauer,Uwe Mayer, Konrad Mattheis</Authors>
-    <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
+		<PackageLicenseExpression>MS-PL</PackageLicenseExpression>
 		<PackageProjectUrl>https://github.com/ezhassen/WPFLocalizationExtension/</PackageProjectUrl>
 		<Copyright>Bernhard Millauer, Uwe Mayer, Konrad Mattheis</Copyright>
-		<Description>LocalizationExtension is a really easy way to localize any type of DependencyProperties or native Properties on DependencyObjects (This is a fork to support .net core 3.1)</Description>
-    <Company>ezhassen</Company>
+		<Description>LocalizationExtension is a really easy way to localize any type of DependencyProperties or native Properties on DependencyObjects (This is a fork to support .net core 3.1 to net9.0)</Description>
+		<Company>ezhassen</Company>
 		<Product>WPF Localization Extension</Product>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 		<PackageReleaseNotes></PackageReleaseNotes>
 		<NeutralLanguage>en-US</NeutralLanguage>
 		<PackageTags>wpf localization extension globalization resx csv resource language</PackageTags>
 		<RepositoryUrl>https://github.com/ezhassen/WPFLocalizationExtension</RepositoryUrl>
-    <PackageReleaseNotes></PackageReleaseNotes>
+		<PackageReleaseNotes></PackageReleaseNotes>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
@@ -44,7 +44,7 @@
 		<None Remove="packages.lock.json" />
 		<None Remove="public.snk" />
 	</ItemGroup>
-  
+
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -61,30 +61,31 @@
 		<AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
 		<PackageId>$(AssemblyName).UnSigned</PackageId>
 		<UnSignedFlag>.UnSigned</UnSignedFlag>
-		 <!--we can handle only one packages.lock.json so for now for unsigned just disable the usages--> 
+		<!--we can handle only one packages.lock.json so for now for unsigned just disable the usages-->
 		<RestorePackagesWithLockFile>false</RestorePackagesWithLockFile>
 	</PropertyGroup>
-  
+
 	<!--References for .Net Framwork 4 and 35-->
-	<ItemGroup Condition="!$(TargetFramework.StartsWith('netcore'))">
+	<ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
 		<Reference Include="System.Management" />
 	</ItemGroup>
 
-	<!--References for .Net Core 3.x-->
-	<ItemGroup Condition="$(TargetFramework.StartsWith('netcore'))">
-		<PackageReference Include="System.Management" Version="7.0.0" />
-		<PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+	<!--References for .Net Core 3.x + net6+-->
+	<ItemGroup Condition="!$(TargetFramework.StartsWith('net4'))">
+		<PackageReference Include="System.Management" Version="9.0.6" />
+		<PackageReference Include="System.Drawing.Common" Version="9.0.6" />
 	</ItemGroup>
 
 	<!--PackageReference for all framworks-->
 	<ItemGroup>
-    <PackageReference Include="XAMLMarkupExtensionsEzzFork" Version="2.1.4" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-		<PackageReference Include="GitVersionTask" Version="5.12.0" PrivateAssets="All" />
+		<PackageReference Include="XAMLMarkupExtensionsEzzFork" Version="2.1.4" />
+		<!--GitVersion.MsBuild version 6.0.2 there issues whith some projects (To show in updates again just remove [])-->
+		<PackageReference Include="GitVersion.MsBuild" Version="[5.12.0]" PrivateAssets="All" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
 	</ItemGroup>
 
 	<Target Name="PublishToNugetWithAPIKey" AfterTargets="GenerateNuspec">
-		<ReadLinesFromFile Condition="Exists('$(SolutionDir)\..\..\nugetapikey.txt')" File="$(SolutionDir)\..\..\nugetapikey.txt">
+		<ReadLinesFromFile Condition="Exists('$(SolutionDir)\..\..\ezznugetapikey.txt')" File="$(SolutionDir)\..\..\ezznugetapikey.txt">
 			<Output TaskParameter="Lines" PropertyName="NugetAPIKey" />
 		</ReadLinesFromFile>
 		<Exec Condition="('$(NugetAPIKey)' != '')" WorkingDirectory="$(BaseDir)" Command="dotnet nuget push $(PackageOutputAbsolutePath)$(PackageId).$(PackageVersion).nupkg -k $(NugetAPIKey) -s https://api.nuget.org/v3/index.json" />
